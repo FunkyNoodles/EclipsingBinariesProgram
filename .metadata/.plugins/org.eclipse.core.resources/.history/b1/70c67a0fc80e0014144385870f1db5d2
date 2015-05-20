@@ -1,0 +1,11 @@
+package brightnessTest;
+
+public class BrightnessTest {
+	public static void main(String [ ] args){
+		float anglePointer;
+		Vector[] vector = new Vector[8];
+		for(anglePointer=0; anglePointer<=90; anglePointer=anglePointer+45){
+			
+		}
+	}
+}

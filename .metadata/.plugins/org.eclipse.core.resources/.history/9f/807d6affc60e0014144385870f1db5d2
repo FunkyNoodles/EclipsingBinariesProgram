@@ -1,0 +1,8 @@
+package brightnessTest;
+
+public class BrightnessTest {
+	public static void main(String [ ] args){
+		float anglePointer;
+		
+	}
+}

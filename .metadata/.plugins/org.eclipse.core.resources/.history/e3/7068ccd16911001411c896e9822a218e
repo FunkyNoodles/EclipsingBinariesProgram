@@ -1,0 +1,152 @@
+package brightnessTest;
+
+import java.io.File;
+import java.io.IOException;
+
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+
+public class BrightnessTest {
+	
+	static double speed = 40;
+	static double totalSum = 0;
+	
+	static Star1Brightness star1 = new Star1Brightness();
+	static Star2Brightness star2 = new Star2Brightness();
+	
+	static double[] star1Heights = new double[star1.slices];
+	static double[] star2Heights = new double[star2.slices];
+	
+	static double sumTotal=0;
+
+	//for eclipse
+	static int startingSlice = 0;
+	static int endingSlice = 0;
+	static double startingPoint = 0;
+	static double endingPoint=0;
+	
+	static int[] sliceAssignment1;
+	
+	public static void main(String[] args){
+		
+		int counter=0;
+		
+		XYSeries series = new XYSeries("XYGraph");
+
+		setHeightOfSlice();
+		
+		for(startingPoint=0;startingPoint<=star1.radius;startingPoint=startingPoint+50){
+			if(startingPoint<=2*star2.radius){
+				endingPoint = 0;
+			}
+			if(startingPoint>2*star2.radius && startingPoint<=2*star1.radius){
+				endingPoint = endingPoint+50;
+			}
+			if(startingPoint>2*star1.radius){
+				startingPoint = star1.radius;
+				endingPoint = endingPoint+50;
+			}
+			startingSlice = (int)(startingPoint/star1.radius/2*star1.slices);
+			endingSlice = (int)(endingPoint/star1.radius/2*star1.slices+0.5);
+			if(endingSlice==star1.slices-1){
+				break;
+			}
+			sliceAssignment1 = new int[endingSlice-startingSlice];
+			for(int i=0;i<endingSlice-startingSlice;i++){
+				sliceAssignment1[i]=(int) (star2.slices-1-star2.slices*(i*star2.sliceLength)/star2.radius/2);
+			}
+			for(startingSlice=startingSlice;startingSlice<=endingSlice;startingSlice++){
+				series.add(counter,eclipse(startingSlice,endingSlice));
+			}
+			counter++;
+		}
+		
+		/*for(int j=0;j<1000;j++){
+			series.add(j,eclipse(0,j));
+		}
+		for(int k=999;k>=0;k--){
+			series.add(1000+1000-k,eclipse(999-k,999));
+		}*/
+		
+		System.out.println("Done!");
+		
+		
+		XYSeriesCollection dataset = new XYSeriesCollection();
+		dataset.addSeries(series);
+		// Generate the graph
+		JFreeChart chart = ChartFactory.createXYLineChart(
+		"Luminosity vs. Time", // Title
+		"Time", // x-axis Label
+		"Luminosity", // y-axis Label
+		dataset, // Dataset
+		PlotOrientation.VERTICAL, // Plot Orientation
+		true, // Show Legend
+		true, // Use tooltips
+		false // Configure chart to generate URLs?
+		);
+		
+		try {
+			System.out.println("Creating Graph...");
+			ChartUtilities.saveChartAsJPEG(new File("D:/Project/COSMOS/EclipsingBinaries/Charts/Test.jpg"), chart, 800, 600);
+		} catch (IOException e) {
+			System.err.println("Problem occurred creating chart.");
+		}
+	}
+	
+	public static double eclipse(int sliceStart, int sliceEnd){
+		
+		double currentHeight = 0;
+		double totalHeight = 0;
+		sumTotal = star1.sum+star2.sum;
+		for(int i=sliceStart;i<sliceEnd;i++){
+			for(int sideIndex=0;sideIndex<star1.polygonSides/2+1;sideIndex++){
+				star1.polygonSideLength = 2*Math.PI*getHeightOfSlice2(999-i)/star1.polygonSides;
+				currentHeight = star1.polygonSideLength*Math.sin(Math.abs(star1.innerAngle-sideIndex*Math.toRadians(star1.angleStep)));
+				totalHeight = totalHeight + currentHeight; 
+				
+				if(totalHeight>(getHeightOfSlice1(i)-getHeightOfSlice2(999-i))/2 || totalHeight<(getHeightOfSlice1(i)-getHeightOfSlice2(999-i))/2+(getHeightOfSlice2(999-i))){
+					sumTotal = sumTotal-star1.component[i][sideIndex];
+					//System.out.println(sumTotal);
+				}
+			}
+		}
+		return sumTotal;
+	}
+	
+	public static double getHeightOfSlice1(int sliceIndex){
+		return 2*star1Heights[sliceIndex];
+	}
+	
+	public static double getHeightOfSlice2(int sliceIndex){
+		return 2*star2Heights[sliceIndex];
+	}
+	
+	public static void setHeightOfSlice(){
+		
+		int xCoord;
+		for(int sliceIndex1=0; sliceIndex1<star1.slices;sliceIndex1++){
+			
+			xCoord = Math.abs(star1.hemiSlices-sliceIndex1);
+			if(xCoord==0){
+				star1Heights[sliceIndex1]=star1.radius;
+			}else{
+				star1Heights[sliceIndex1] = Math.sqrt((star1.radius)*(star1.radius)-Math.pow((star1.radius-(star1.radius/xCoord)), 2));
+			}
+		}
+		
+		for(int sliceIndex2=0; sliceIndex2<star1.slices;sliceIndex2++){
+			
+			xCoord = Math.abs(star2.hemiSlices-sliceIndex2);
+			if(xCoord==0){
+				star2Heights[sliceIndex2]=star2.radius;
+			}else{
+				star2Heights[sliceIndex2] = Math.sqrt((star2.radius)*(star2.radius)-Math.pow((star2.radius-(star2.radius/xCoord)), 2));
+			}
+		}
+	}
+}
+

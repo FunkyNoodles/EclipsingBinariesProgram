@@ -1,0 +1,17 @@
+package brightnessTest;
+
+public class Vector {
+	
+	public Vector(float value, float angleV, float angleH){
+		float multiplier=0;
+		if(angleV<90){
+			multiplier = 90-angleV;
+		}
+		if(angleV>90){
+			multiplier = angleV-90;
+		}
+		if(angleV==90){
+			multiplier = 90;
+		}
+	}
+}

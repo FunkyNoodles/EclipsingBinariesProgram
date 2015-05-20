@@ -1,0 +1,15 @@
+package brightnessTest;
+
+public class BrightnessTest {
+	public static void main(String [ ] args){
+		float anglePointer;
+		int counter=0;
+		Vector[] vector = new Vector[8];
+		System.out.print("Value\tAngle\tMisc");
+		for(anglePointer=0; anglePointer<=180; anglePointer=anglePointer+45){
+			vector[counter] = new Vector(2,anglePointer,10);
+			counter++;
+			System.out.print(vector[counter].value);
+		}
+	}
+}

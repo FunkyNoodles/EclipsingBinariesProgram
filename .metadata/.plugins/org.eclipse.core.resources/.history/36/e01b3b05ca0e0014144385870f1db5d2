@@ -1,0 +1,8 @@
+package brightnessTest;
+
+public class Vector {
+	public Vector(float value, float angleV, float angleH){
+		System.out.println();
+		System.out.print(angleV);
+	}
+}
